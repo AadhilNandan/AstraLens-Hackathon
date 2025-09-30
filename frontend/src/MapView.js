@@ -104,8 +104,8 @@ function MapResizer() {
 }
 
 function MapView() {
-    //const tileUrl = "https://astralens-hackathon.onrender.com/tiles/{z}/{y}/{x}.png";
-    const tileUrl = "http://127.0.0.1:5000/tiles/{z}/{y}/{x}.png";
+    const tileUrl = "https://astralens-hackathon.onrender.com/tiles/{z}/{y}/{x}.png";
+    //const tileUrl = "http://127.0.0.1:5000/tiles/{z}/{y}/{x}.png";
     const initialCenter = [-(IMAGE_HEIGHT / 2), IMAGE_WIDTH / 2];
     const initialZoom = MIN_TILE_Z + 1; 
 
