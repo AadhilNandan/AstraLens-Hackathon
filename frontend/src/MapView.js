@@ -31,7 +31,7 @@ const mapBounds = [[0, 0], [-IMAGE_HEIGHT, IMAGE_WIDTH]];
 
 
 function FeatureInteraction() {
-    const { points, addPoint, clearPoints, setDistance, setLabeledFeatures, labeledFeatures } = useContext(MapContext);
+    const { points, addPoint, clearPoints, setDistance, setLabeledFeatures } = useContext(MapContext);
     const map = useMap();
 
     const handleMapClick = useCallback((e) => {
@@ -134,6 +134,7 @@ function MapView() {
                 />
                 
                 <FeatureInteraction />
+                <MapResizer/>
                 
             </MapContainer>
         </div>

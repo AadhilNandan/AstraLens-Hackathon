@@ -9,7 +9,6 @@ function App() {
   const [points, setPoints] = useState([]);
   const [distanceKm, setDistance] = useState('Click two points to measure.');
   const [labeledFeatures, setLabeledFeatures] = useState([]);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const addPoint = useCallback((latlng) => {
     setPoints(prevPoints => {
@@ -25,9 +24,7 @@ function App() {
     setDistance('Click two points to measure.');
   }, []);
 
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
+
 
   const contextValue = {
     points,
