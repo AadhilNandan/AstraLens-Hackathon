@@ -1,0 +1,43 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "risk_level": "High",
+        "description": "Area with high predicted solar particle radiation."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-10.0, 40.0],
+            [10.0, 40.0],
+            [10.0, 20.0],
+            [-10.0, 20.0],
+            [-10.0, 40.0]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "risk_level": "Low",
+        "description": "Area with stable terrain and low resource scarcity."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-50.0, -10.0],
+            [-30.0, -10.0],
+            [-30.0, -30.0],
+            [-50.0, -30.0],
+            [-50.0, -10.0]
+          ]
+        ]
+      }
+    }
+  ]
+}

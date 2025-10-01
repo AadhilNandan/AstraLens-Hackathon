@@ -1,0 +1,23 @@
+[
+  {
+    "id": "TYC-001",
+    "name": "Tycho Crater",
+    "coordinates": [-43.31, -11.36],
+    "description": "A prominent lunar impact crater located in the southern lunar highlands. It is estimated to be 108 million years old and is one of the Moon's brightest craters.",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Tycho_crater_on_the_Moon.jpg/1280px-Tycho_crater_on_the_Moon.jpg"
+  },
+  {
+    "id": "COP-001",
+    "name": "Copernicus Crater",
+    "coordinates": [9.62, -20.08],
+    "description": "A lunar impact crater located in the eastern Oceanus Procellarum. It is a relatively young crater, formed about 800 million years ago.",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Copernicus_crater_AS17-M-2923.jpg/1280px-Copernicus_crater_AS17-M-2923.jpg"
+  },
+  {
+    "id": "APL-011",
+    "name": "Sea of Tranquility",
+    "coordinates": [0.67408, 23.47297],
+    "description": "The landing site of Apollo 11, the first crewed lunar landing in 1969. This vast, dark plain is known as a lunar mare.",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Mare_Tranquillitatis.jpg/1280px-Mare_Tranquillitatis.jpg"
+  }
+]

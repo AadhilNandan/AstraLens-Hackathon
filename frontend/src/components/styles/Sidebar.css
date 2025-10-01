@@ -64,10 +64,29 @@
 }
 
 .sidebar-header .app-title {
-
+}
 
 .sidebar-divider {
     border: none;
     border-top: 1px solid #444466; 
     margin: 20px 0; 
+}
+
+.range-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  background: #007bff; /* Or another color like #FFF */
+  border-radius: 50%;
+  border: 2px solid #111111;
+  margin-top: -5px; /* Vertically center the thumb on the track */
+}
+
+.range-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: #007bff;
+  border-radius: 50%;
+  border: 2px solid #111111;
 }

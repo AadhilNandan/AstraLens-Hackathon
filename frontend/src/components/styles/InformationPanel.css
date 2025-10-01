@@ -1,0 +1,36 @@
+/* Legend for the Topology Overlay */
+.topology-legend {
+    margin-top: 15px;
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0.6);
+    border-radius: 4px;
+    color: #e0e0e0; /* Ensures all text inside is light */
+    font-size: 0.9em;
+}
+
+.topology-legend h4 {
+    margin: 0 0 8px 0;
+    font-size: 1em;
+    border-bottom: 1px solid #0f3460;
+    padding-bottom: 5px;
+    text-align: center;
+    color: #ffffff; /* Explicitly set header color to white */
+}
+
+.legend-color {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  margin-right: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.legend-color.high-risk {
+  /* This matches the red color of your map overlay */
+  background-color: rgba(255, 77, 77, 0.7); 
+}
+
+.legend-color.low-risk {
+  /* This matches the green color of your map overlay */
+  background-color: rgba(77, 255, 77, 0.7);
+}
