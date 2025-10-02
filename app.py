@@ -40,7 +40,7 @@ def ask_ai():
     if not gemini_api_key:
         return jsonify({"error": "API key missing"}), 500
 
-    api_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={gemini_api_key}"
+    api_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key={gemini_api_key}"
 
     prompt = f"""
     You are Astra, an assistant for lunar reconnaissance. 
