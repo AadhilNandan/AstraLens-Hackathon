@@ -36,7 +36,7 @@ def ask_ai():
     if not gemini_api_key:
         return jsonify({"error": "Server configuration error: API key not found."}), 500
 
-    api_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key={gemini_api_key}"
+    api_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={gemini_api_key}"
 
     prompt = f"""You are Astra, an AI assistant for a lunar reconnaissance application. Your knowledge base is the following JSON data containing information about lunar craters, missions, people, and general facts. Answer the user's question concisely based ONLY on this provided data. Do not mention that you are an AI. If the information is not in the data, say that you can only answer questions based on the provided lunar dataset.
 

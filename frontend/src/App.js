@@ -71,6 +71,7 @@ const askAi = async (userQuestion) => {
 
   // The URL of your backend endpoint on Render
   const yourServerUrl = 'https://astralens-hackathon.onrender.com/ask-ai';
+  
 
   try {
     const response = await fetch(yourServerUrl, {
