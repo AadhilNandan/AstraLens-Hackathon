@@ -3,13 +3,26 @@ from flask_cors import CORS
 import os
 from flask import request, jsonify
 import requests
-from dotenv import load_dotenv
 import json
+import google.auth
+from google.auth.transport.requests import AuthorizedSession
+from dotenv import load_dotenv
+
 
 load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
+
+try:
+    credentials, project = google.auth.default(scopes=["https://www.googleapis.com/auth/cloud-platform"])
+    print("Google credentials loaded successfully.")
+except Exception as e:
+    print(f"FATAL: Could not load Google credentials. Please check GOOGLE_APPLICATION_CREDENTIALS. Error: {e}")
+    credentials = None
+    project = None
+GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent"
+
 
 @app.route("/tiles/<string:z>/<int:y>/<int:x>.png") 
 def get_tile(z, y, x): 
@@ -30,17 +43,17 @@ with open("lunar_database.json", "r") as f:
 
 @app.route('/ask-ai', methods=['POST'])
 def ask_ai():
+    global credentials
+
+    if not credentials:
+        return jsonify({"error": "Google credentials not configured"}), 500
     data = request.get_json()
     user_question = data.get('user_question')
 
     if not user_question:
         return jsonify({"error": "No question provided"}), 400
 
-    gemini_api_key = os.getenv('GEMINI_API_KEY')
-    if not gemini_api_key:
-        return jsonify({"error": "API key missing"}), 500
-
-    api_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key={gemini_api_key}"
+    authed_session = AuthorizedSession(credentials)
 
     prompt = f"""
     You are Astra, an assistant for lunar reconnaissance. 
@@ -56,7 +69,7 @@ def ask_ai():
     payload = {"contents": [{"parts": [{"text": prompt}]}]}
 
     try:
-        response = requests.post(api_url, json=payload)
+        response = requests.post(GEMINI_API_URL, json=payload)
         response.raise_for_status()
         gemini_response = response.json()
         ai_text = (
