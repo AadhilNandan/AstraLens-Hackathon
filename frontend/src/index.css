@@ -1,3 +1,14 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.ai-panel-glow {
+  box-shadow:
+    0 0 40px 8px #00fff7cc,
+    0 0 0 2px #00fff744,
+    0 2px 32px 0 #000a;
+}
+
+.shadow-inner-dark {
+  box-shadow: 0 2px 8px #000a inset;
+}

@@ -16,7 +16,7 @@ function App() {
   const [searchId, setSearchId] = useState('');
   const [appMode, setAppMode] = useState('normal');
   const [analysisResult, setAnalysisResult] = useState(null);
-  const [isAiPanelOpen, setIsAiPanelOpen] = useState(true);
+  const [isAiPanelOpen, setIsAiPanelOpen] = useState(false);
   const [chatHistory, setChatHistory] = useState([]);
   const [isAiLoading, setIsAiLoading] = useState(false);
  

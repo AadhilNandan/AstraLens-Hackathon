@@ -6,14 +6,32 @@ import { MapContext } from './App';
 import MapControls from './components/MapControls'; 
 import AiPanel from './components/AiPanel';
 import topologyData from './components/assets/topology_zones.geojson'; 
+
+const customIconSvg = `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <circle cx="16" cy="16" r="14" fill="#00FFFF" stroke="#111111" stroke-width="2"/>
+  <circle cx="16" cy="16" r="6" fill="#111111"/>
+  <circle cx="16" cy="16" r="3" fill="#FFFFFF"/>
+</svg>
+`;
+const iconUrl = `data:image/svg+xml;utf8,${encodeURIComponent(customIconSvg)}`;
+
+const customMarkerIcon = new L.Icon({
+  iconUrl: iconUrl,
+  iconSize: [32, 32],
+  iconAnchor: [16, 16],
+  popupAnchor: [0, -16],
+  shadowUrl: null,
+});
+
 if (L && L.Icon && L.Icon.Default) {
-    delete L.Icon.Default.prototype._getIconUrl;
-    L.Icon.Default.mergeOptions({
-        iconUrl: 'data:image/svg+xml;base64,...', 
-        shadowUrl: 'data:image/svg+xml;base64,...', 
-        iconSize: [25, 41],
-        iconAnchor: [12, 41],
-    });
+    delete L.Icon.Default.prototype._getIconUrl;
+    L.Icon.Default.mergeOptions({
+        iconUrl: iconUrl,
+        shadowUrl: null,
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
+    });
 }
 
 const IMAGE_WIDTH = 34748;
@@ -82,19 +100,29 @@ function FeatureInteraction() {
     );
 }
 
-function MapResizer() {
-  const { isAiPanelOpen } = useContext(MapContext); 
-  const map = useMap();
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      map.invalidateSize(); 
-    }, 310); 
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [isAiPanelOpen, map]); 
 
-  return null;
+function MapResizer() {
+  const { isAiPanelOpen } = useContext(MapContext); 
+  const map = useMap();
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      map.invalidateSize(); 
+    }, 310); 
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [isAiPanelOpen, map]); 
+    
+    useEffect(() => {
+        const initialTimer = setTimeout(() => {
+            map.invalidateSize();
+        }, 50); 
+        return () => {
+            clearTimeout(initialTimer);
+        };
+    }, []); 
+
+  return null;
 }
 
 function SearchFlyTo({ feature }) {
@@ -112,17 +140,17 @@ function SearchFlyTo({ feature }) {
 
 
 function DistanceDisplay() {
-    const { distanceKm, points, appMode } = useContext(MapContext);
+    const { distanceKm, points, appMode } = useContext(MapContext);
 
-    if (appMode !== 'measure' || points.length === 0) {
-        return null;
-    }
-    
-    return (
-        <div className="leaflet-top leaflet-center bg-gray-800 bg-opacity-80 text-white p-2 rounded-md shadow-lg" style={{ marginTop: '10px' }}>
-            <p className="text-lg font-bold">{distanceKm} km</p>
-        </div>
-    )
+    if (appMode !== 'measure' || points.length === 0) {
+        return null;
+    }
+    
+    return (
+        <div className="leaflet-top leaflet-center bg-black/60 backdrop-blur-sm text-cyan-400 p-2 rounded-xl shadow-lg border border-cyan-800" style={{ marginTop: '10px' }}>
+            <p className="text-xl font-bold">{distanceKm} km</p>
+        </div>
+    )
 }
 
 
@@ -234,21 +262,39 @@ function AnalysisScorecard() {
 
     const { avgSlope, safeArea, suitability } = analysisResult.stats;
 
+    const suitabilityColor = suitability.startsWith('A') ? 'text-green-400' : 
+                             suitability.startsWith('B') ? 'text-yellow-400' : 
+                             suitability.startsWith('C') ? 'text-orange-400' : 'text-red-400';
+
     return (
-        <div className="leaflet-top leaflet-center bg-gray-900 bg-opacity-90 text-white p-3 rounded-lg shadow-lg border border-gray-700" style={{ marginTop: '50px' }}>
-            <h3 className="text-lg font-bold border-b border-gray-600 pb-1 mb-2">Landing Site Analysis</h3>
+        <div
+            className="leaflet-top leaflet-center bg-black/60 backdrop-blur-sm text-white p-4 rounded-xl shadow-2xl border border-cyan-700"
+            style={{
+                marginTop: '30px',
+                maxWidth: '340px',
+                minWidth: '260px',
+                width: '100%',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                position: 'absolute',
+                zIndex: 1000,
+            }}
+        >
+            <h3 className="text-lg font-extrabold text-cyan-400 border-b border-cyan-800 pb-2 mb-3 text-center">
+                Landing Site Analysis
+            </h3>
             <div className="grid grid-cols-3 gap-4 text-center">
-                <div>
-                    <p className="text-2xl font-bold">{avgSlope}°</p>
-                    <p className="text-xs text-gray-400">Avg Slope</p>
+                <div className="border-r border-gray-700/50">
+                    <p className="text-2xl font-bold text-gray-200">{avgSlope}°</p>
+                    <p className="text-xs text-cyan-400 mt-1">Avg Slope</p>
+                </div>
+                <div className="border-r border-gray-700/50">
+                    <p className="text-2xl font-bold text-gray-200">{safeArea}%</p>
+                    <p className="text-xs text-cyan-400 mt-1">Safe Area</p>
                 </div>
                 <div>
-                    <p className="text-2xl font-bold">{safeArea}%</p>
-                    <p className="text-xs text-gray-400">Safe Area</p>
-                </div>
-                <div>
-                    <p className="text-2xl font-bold text-green-400">{suitability}</p>
-                    <p className="text-xs text-gray-400">Suitability</p>
+                    <p className={`text-2xl font-extrabold ${suitabilityColor}`}>{suitability}</p>
+                    <p className="text-xs text-cyan-400 mt-1">Suitability</p>
                 </div>
             </div>
         </div>
@@ -415,7 +461,7 @@ function MapView({ isSearchVisible }) {
                 <AnalysisScorecard />
                 
                 {searchedFeature && (
-                    <Marker position={searchedFeature.coordinates}>
+                    <Marker position={searchedFeature.coordinates} icon={customMarkerIcon}>
                         <Popup minWidth={250}>
                             <div className="feature-popup p-2 bg-white rounded text-gray-800">
                                 <h3 className="text-lg font-bold mb-1">{searchedFeature.name}</h3>

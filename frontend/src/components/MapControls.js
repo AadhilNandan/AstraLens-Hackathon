@@ -22,7 +22,7 @@ function MapControls({ onFeatureSearch }) {
     }
 
     if (!inputValue) {
-      alert("Please enter a Feature ID.");
+      console.error("Please enter a Feature ID.");
       return;
     }
 
@@ -45,18 +45,27 @@ function MapControls({ onFeatureSearch }) {
 
   return (
     <div className="map-controls">
-      <div className="feature-search-container">
+      <div className="feature-search-container"
+      title="Search the lunar feature database by ID (e.g., 8 H-1) to quickly locate and highlight a specific feature on the map.">
         <label htmlFor="feature-id-search">Feature ID Search</label>
         <div className="search-bar">
           <input
             type="text"
             id="feature-id-search"
-            placeholder="e.g., TYC-001"
+            placeholder="e.g., 8 H-1"
             value={inputValue}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
+            className="flex-grow bg-black/50 border border-cyan-600 rounded-md p-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-400 text-sm h-9"
+            title="Enter Feature ID"
           />
-          <button onClick={handleSearch}>Search</button>
+          <button 
+            onClick={handleSearch} 
+            className="bg-cyan-400 hover:bg-cyan-300 text-black font-bold px-4 py-2 rounded-md transition-colors text-sm flex items-center justify-center h-9 ml-2"
+            title="Execute Feature Search"
+          >
+            Search
+          </button>
         </div>
       </div>
     </div>
