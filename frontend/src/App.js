@@ -1,4 +1,4 @@
-import React, { useState, createContext, useCallback, useEffect } from 'react';
+import React, { useState, createContext, useCallback, useEffect, use } from 'react';
 import MapView from './MapView';
 import Sidebar from './components/Sidebar';
 import './App.css';
@@ -58,6 +58,7 @@ function App() {
       return newMode;
     });
   };
+
 //--- AI Assistant Logic ---
 const askAi = async (userQuestion) => {
   if (!lunarData) {
@@ -79,8 +80,8 @@ const askAi = async (userQuestion) => {
       headers: { 'Content-Type': 'application/json' },
       // Send the question and knowledge base to your server
       body: JSON.stringify({ 
-        userQuestion: userQuestion,
-        knowledgeBase: lunarData 
+        user_question: userQuestion,
+        knowledge_base: lunarData,
       })
     });
 
@@ -90,8 +91,7 @@ const askAi = async (userQuestion) => {
     }
 
     const result = await response.json();
-    // The response from your server is passed through, so this part stays the same
-    const aiResponse = result.candidates?.[0]?.content?.parts?.[0]?.text || "Sorry, I couldn't process that request.";
+    const aiResponse = result.answer || "Sorry, I couldn't process that request.";
     
     setChatHistory(prev => [...prev, { role: 'model', text: aiResponse }]);
 

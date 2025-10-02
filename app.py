@@ -4,7 +4,7 @@ import os
 from flask import request, jsonify
 import requests
 from dotenv import load_dotenv
-
+import json
 
 load_dotenv()
 
@@ -23,48 +23,54 @@ def get_tile(z, y, x):
     else:
         abort(404)
 
+with open("lunar_data.json", "r") as f:
+    LUNAR_DATA = json.load(f)
+
+
+
 @app.route('/ask-ai', methods=['POST'])
 def ask_ai():
-    # Get the data your React app sent
     data = request.get_json()
     user_question = data.get('userQuestion')
-    knowledge_base = data.get('knowledgeBase')
 
-    # Get the secret API key from Render's environment variables
+    if not user_question:
+        return jsonify({"error": "No question provided"}), 400
+
     gemini_api_key = os.getenv('GEMINI_API_KEY')
-
     if not gemini_api_key:
-        return jsonify({"error": "Server configuration error: API key not found."}), 500
+        return jsonify({"error": "API key missing"}), 500
 
     api_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={gemini_api_key}"
 
-    prompt = f"""You are Astra, an AI assistant for a lunar reconnaissance application. Your knowledge base is the following JSON data containing information about lunar craters, missions, people, and general facts. Answer the user's question concisely based ONLY on this provided data. Do not mention that you are an AI. If the information is not in the data, say that you can only answer questions based on the provided lunar dataset.
+    prompt = f"""
+    You are Astra, an assistant for lunar reconnaissance. 
+    Use ONLY the following dataset to answer questions:
 
     JSON KNOWLEDGE BASE:
-    {knowledge_base}
+    {json.dumps(LUNAR_DATA, indent=2)}
 
     USER QUESTION:
     "{user_question}"
     """
 
-    payload = {
-        "contents": [{
-            "parts": [{"text": prompt}]
-        }]
-    }
+    payload = {"contents": [{"parts": [{"text": prompt}]}]}
 
     try:
         response = requests.post(api_url, json=payload)
         response.raise_for_status()
-        return jsonify(response.json())
-    except requests.exceptions.RequestException as e:
-        print(f"Error calling Google API: {e}")
-        try:
-            return jsonify(response.json()), response.status_code
-        except:
-            return jsonify({"error": "An internal server error occurred while contacting the AI."}), 500
+        gemini_response = response.json()
+        ai_text = (
+            gemini_response.get("candidates", [{}])[0]
+            .get("content", {})
+            .get("parts", [{}])[0]
+            .get("text", "Sorry, I couldn't generate a response.")
+        )
 
-
+        return jsonify({"answer": ai_text})
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"error": "Failed to contact Gemini"}), 500
+    
 if __name__ == '__main__':
     print(f"Starting server. Current working directory: {os.getcwd()}")
     app.run(debug=True, port=5000)
