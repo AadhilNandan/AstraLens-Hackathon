@@ -6,6 +6,7 @@ import requests
 import json
 import google.auth
 from google.auth.transport.requests import AuthorizedSession
+from google.auth.exceptions import DefaultCredentialsError
 from dotenv import load_dotenv
 
 
@@ -15,24 +16,27 @@ app = Flask(__name__)
 CORS(app)
 
 try:
-    key_file_name = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
-    if key_file_name:
-        full_key_path = os.path.join(os.getcwd(), key_file_name)
-        
-        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = full_key_path
-        
-        print(f"Set GOOGLE_APPLICATION_CREDENTIALS to: {full_key_path}")
+    credentials = None
+    project = None
 
-    credentials, project = google.auth.default(scopes=["https://www.googleapis.com/auth/cloud-platform"])
-    print("Google credentials loaded successfully.")
+    service_account_json_content = os.getenv('SERVICE_ACCOUNT_JSON')
     
+    if service_account_json_content:
+        credentials, project = google.auth.load_credentials_from_dict(
+            json.loads(service_account_json_content),
+            scopes=["https://www.googleapis.com/auth/cloud-platform"]
+        )
+        print("Google credentials loaded successfully from SERVICE_ACCOUNT_JSON.")
+    else:
+        credentials, project = google.auth.default(scopes=["https://www.googleapis.com/auth/cloud-platform"])
+        print("Attempting to load Google credentials via default method (will likely fail on Render).")
+
 except Exception as e:
-    print(f"FATAL: Could not load Google credentials. Error: {e}")
+    print(f"FATAL: Could not load Google credentials. Check SERVICE_ACCOUNT_JSON. Error: {e}")
     credentials = None
     project = None
 
 GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent"
-
 
 @app.route("/tiles/<string:z>/<int:y>/<int:x>.png") 
 def get_tile(z, y, x): 
@@ -53,18 +57,21 @@ with open("lunar_database.json", "r") as f:
 
 @app.route('/ask-ai', methods=['POST'])
 def ask_ai():
-    global credentials
+    global credentials # Access the globally loaded credentials
 
     if not credentials:
-        return jsonify({"error": "Google credentials not configured"}), 500
+        # Returns 500 if the credential setup failed at startup
+        return jsonify({"error": "AI Service not configured: Missing Google credentials."}), 500
+
     data = request.get_json()
     user_question = data.get('user_question')
 
     if not user_question:
         return jsonify({"error": "No question provided"}), 400
 
+    # The AuthorizedSession handles adding the secure 'Authorization' header
     authed_session = AuthorizedSession(credentials)
-
+    
     prompt = f"""
     You are Astra, an assistant for lunar reconnaissance. 
     Use ONLY the following dataset to answer questions:
@@ -79,8 +86,9 @@ def ask_ai():
     payload = {"contents": [{"parts": [{"text": prompt}]}]}
 
     try:
+        # Use the secure authed_session instead of unauthenticated requests
         response = authed_session.post(GEMINI_API_URL, json=payload)
-        response.raise_for_status() 
+        response.raise_for_status() # Raises an exception for 4xx/5xx status codes
         
         gemini_response = response.json()
         
@@ -98,6 +106,7 @@ def ask_ai():
 
         return jsonify({"answer": ai_text})
     except requests.exceptions.HTTPError as e:
+        # Catch specific HTTP errors 
         error_message = f"AI service returned an HTTP error: {e}"
         try:
             error_details = response.json().get('error', {}).get('message', '')
@@ -109,7 +118,8 @@ def ask_ai():
         return jsonify({"error": error_message}), 500
     except Exception as e:
         print(f"General Error: {e}")
-        return jsonify({"error": "Failed to contact Gemini"}), 500    
+        return jsonify({"error": "Failed to contact Gemini"}), 500
+ 
 if __name__ == '__main__':
     print(f"Starting server. Current working directory: {os.getcwd()}")
     app.run(debug=True, port=5000)
