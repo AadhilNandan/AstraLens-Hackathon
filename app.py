@@ -23,7 +23,7 @@ def get_tile(z, y, x):
     else:
         abort(404)
 
-with open("lunar_data.json", "r") as f:
+with open("lunar_database.json", "r") as f:
     LUNAR_DATA = json.load(f)
 
 
