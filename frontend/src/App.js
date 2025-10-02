@@ -1,4 +1,4 @@
-import React, { useState, createContext, useCallback, useEffect, use } from 'react';
+import React, { useState, createContext, useCallback, useEffect} from 'react';
 import MapView from './MapView';
 import Sidebar from './components/Sidebar';
 import './App.css';

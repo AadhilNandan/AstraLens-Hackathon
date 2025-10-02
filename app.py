@@ -31,7 +31,7 @@ with open("lunar_data.json", "r") as f:
 @app.route('/ask-ai', methods=['POST'])
 def ask_ai():
     data = request.get_json()
-    user_question = data.get('userQuestion')
+    user_question = data.get('user_question')
 
     if not user_question:
         return jsonify({"error": "No question provided"}), 400
