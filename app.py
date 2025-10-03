@@ -18,7 +18,7 @@ CORS(app)
 api_key = os.getenv("GEMINI_API_KEY")
 if api_key:
     genai.configure(api_key=api_key)
-    client = genai.GenerativeModel("gemini-1.5-flash")
+    client = genai.GenerativeModel("models/gemini-pro-latest")
     print("Gemini client initialized successfully with API key.")
 else:
     print("FATAL: GEMINI_API_KEY not found in environment variables.")
