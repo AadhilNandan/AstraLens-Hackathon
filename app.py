@@ -85,7 +85,10 @@ def ask_ai():
 
     try:
         response = client.generate_content(prompt)
-        ai_text = response.text
+
+        ai_text = getattr(response, "text", "").strip()
+        if not ai_text:
+            ai_text = "I cannot answer that based on the provided data."
         return jsonify({"answer": ai_text})
 
     except exceptions.ResourceExhausted as e:
