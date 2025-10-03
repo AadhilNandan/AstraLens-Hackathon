@@ -24,7 +24,8 @@ try:
             json.loads(service_account_json_content),
             scopes=["https://www.googleapis.com/auth/cloud-platform"]
         )
-        client = genai.GenerativeModel('gemini-pro', credentials=credentials)
+        genai.configure(credentials=credentials)
+        client = genai.GenerativeModel('gemini-pro')
         print("Gemini Client initialized successfully from SERVICE_ACCOUNT_JSON.")
     else:
         print("SERVICE_ACCOUNT_JSON not found. Attempting to load via API Key.")
