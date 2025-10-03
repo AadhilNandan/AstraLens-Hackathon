@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 # --- Official Google Generative AI SDK Imports ---
 import google.auth
 import google.generativeai as genai
-from google.generativeai.errors import APIError
+from google.generativeai import APIError
 # -------------------------------------------------
 
 load_dotenv()
