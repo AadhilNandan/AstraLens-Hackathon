@@ -82,7 +82,7 @@ def ask_ai():
     - If the data does not contain the answer, respond with "I cannot answer that based on the provided data."
     User Question: "{user_question}"
 
-    Answer:
+    Astra's Answer:
     """
     # --- END PROMPT LOGIC ---
 
