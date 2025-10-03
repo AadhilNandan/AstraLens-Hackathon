@@ -2,5 +2,5 @@ Flask==3.0.3
 Flask-Cors==4.0.0
 gunicorn==22.0.0
 python-dotenv==1.0.1
-google-auth
-google-generativeai
+google-auth==2.41.1
+google-generativeai==0.8.5

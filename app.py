@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 # --- Official Google Generative AI SDK Imports ---
 import google.auth
 import google.generativeai as genai
-from google.generativeai import APIError
+from google.api_core import exceptions
 # -------------------------------------------------
 
 load_dotenv()
@@ -105,16 +105,21 @@ def ask_ai():
         ai_text = response.text
         return jsonify({"answer": ai_text})
 
-    except APIError as e:
-        error_message = f"Gemini API Error: {e}"
-        print(f"API Error contacting Gemini: {error_message}")
-        if "rate limit" in str(e).lower() or "429" in str(e):
-            return jsonify({"error": "Rate limit exceeded. Please wait and try again."}), 429
-        return jsonify({"error": error_message}), 500
+    except exceptions.ResourceExhausted as e:
+        print(f"API Error: Rate limit exceeded. {e}")
+        return jsonify({"error": "Rate limit exceeded. Please wait and try again."}), 429
 
+    except exceptions.PermissionDenied as e:
+        print(f"API Error: Permission denied. Check API key. {e}")
+        return jsonify({"error": "Authentication error. Please check your API key."}), 403
+
+    except exceptions.GoogleAPICallError as e:
+        print(f"A Google API call error occurred: {e}")
+        return jsonify({"error": "An error occurred while communicating with the AI service."}), 500
+    
     except Exception as e:
         print(f"General Error during API call: {e}")
-        return jsonify({"error": "Failed to contact Gemini (General Error)."}), 500
+        return jsonify({"error": "An unexpected error occurred."}), 500
 
 if __name__ == '__main__':
     print(f"Starting server. Current working directory: {os.getcwd()}")
