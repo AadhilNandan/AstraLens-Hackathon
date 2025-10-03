@@ -5,7 +5,6 @@ import json
 from dotenv import load_dotenv
 
 # --- Official Google Generative AI SDK Imports ---
-import google.auth
 import google.generativeai as genai
 from google.api_core import exceptions
 # -------------------------------------------------
@@ -15,31 +14,14 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app)
 
-try:
-    client = None
-    service_account_json_content = os.getenv('SERVICE_ACCOUNT_JSON')
-
-    if service_account_json_content:
-        credentials, _ = google.auth.load_credentials_from_dict(
-            json.loads(service_account_json_content),
-            scopes=["https://www.googleapis.com/auth/cloud-platform"]
-        )
-        genai.configure(credentials=credentials)
-        client = genai.GenerativeModel('gemini-pro')
-        print("Gemini Client initialized successfully from SERVICE_ACCOUNT_JSON.")
-    else:
-        print("SERVICE_ACCOUNT_JSON not found. Attempting to load via API Key.")
-        api_key = os.getenv('GEMINI_API_KEY')
-        if api_key:
-            genai.configure(api_key=api_key)
-            client = genai.GenerativeModel('gemini-pro')
-            print("Gemini Client initialized successfully using API_KEY.")
-        else:
-            print("FATAL: No SERVICE_ACCOUNT_JSON or GEMINI_API_KEY found.")
-            client = None
-
-except Exception as e:
-    print(f"FATAL: Could not initialize Gemini Client. Check credentials. Error: {e}")
+# --- Gemini API Key Auth Only ---
+api_key = os.getenv("GEMINI_API_KEY")
+if api_key:
+    genai.configure(api_key=api_key)
+    client = genai.GenerativeModel("gemini-pro")
+    print("Gemini client initialized successfully with API key.")
+else:
+    print("FATAL: GEMINI_API_KEY not found in environment variables.")
     client = None
 # --------------------------------------------------------------------
 
