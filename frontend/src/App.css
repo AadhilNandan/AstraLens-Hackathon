@@ -35,3 +35,8 @@ body {
         0 0 40px rgba(0, 255, 255, 0.4), 
         0 0 80px rgba(0, 255, 255, 0.15); 
 }
+
+.leaflet-top.leaflet-left .leaflet-control-scale {
+  margin-top: 3.5rem !important; 
+  margin-left: 5px !important;  
+}

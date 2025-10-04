@@ -71,7 +71,7 @@ function App() {
         const response = await fetch(yourServerUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
+            body: JSON.stringify({
                 user_question: userQuestion,
             })
         });
@@ -104,8 +104,8 @@ function App() {
 
   const selectFeatureForSearch = (id) => {
     console.log(`[App.js] A feature was clicked! Setting searchId to: "${id}"`);
-    setSearchId(String(id)); 
-    setIsSearchVisible(true); 
+    setSearchId(String(id));
+    setIsSearchVisible(true);
   };
 
   const addPoint = useCallback((latlng) => {
@@ -126,27 +126,31 @@ function App() {
     points, addPoint, clearPoints, distanceKm, setDistance, labeledFeatures, setLabeledFeatures,
     lunarData, allFeatures, searchId, setSearchId, selectFeatureForSearch, appMode,
     toggleMeasureMode, analysisResult, setAnalysisResult, toggleAnalysisMode, isAiPanelOpen,
-    toggleAiPanel, chatHistory, isAiLoading, cooldown, askAi, 
+    toggleAiPanel, chatHistory, isAiLoading, cooldown, askAi,
   };
 
   return (
     <MapContext.Provider value={contextValue}>
-      <div className={`flex h-screen w-screen bg-black ${appMode === 'measure' || appMode === 'analysis' ? 'cursor-crosshair' : ''}`}>       
-        <Sidebar 
-          isOpen={isSidebarOpen} 
+      <div className={`flex h-screen w-screen bg-black ${appMode === 'measure' || appMode === 'analysis' ? 'cursor-crosshair' : ''}`}>
+        <Sidebar
+          isOpen={isSidebarOpen}
           toggleSidebar={toggleSidebar}
-          toggleSearch={() => setIsSearchVisible(prev => !prev)} 
+          toggleSearch={() => setIsSearchVisible(prev => !prev)}
         />
-        
-        <main className="flex-grow h-full relative">
-          <div className="absolute top-4 left-4 md:hidden z-[1001]">
-            <button onClick={toggleSidebar} className="p-2 text-white">
+
+        <main className={`flex-grow h-full relative ${isSidebarOpen ? 'z-0' : 'z-10'}`}>
+          {/* Hamburger Menu: Moved to the top-right corner */}
+          <div className={`absolute top-4 right-4 md:hidden z-[1001] transition-opacity duration-300 ${isSidebarOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+            <button
+              onClick={toggleSidebar}
+              className="p-2 bg-gray-900 bg-opacity-75 rounded-md text-white backdrop-blur-sm shadow-lg"
+            >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
           </div>
-          
+
           <MapView isSearchVisible={isSearchVisible} />
         </main>
       </div>
@@ -154,3 +158,4 @@ function App() {
   );
 }
 export default App;
+

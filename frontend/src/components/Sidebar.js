@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { MapContext } from '../App'; 
+import { MapContext } from '../App';
 import AstraLensLogo from './assets/logo.svg';
 import './styles/Sidebar.css';
 
@@ -14,7 +14,7 @@ function StatusMetric({ value, label, children }) {
   return (
     <div className="text-center">
       <div className="flex items-baseline justify-center gap-1">
-        <p className="text-3xl font-bold text-cyan-300">{value}</p>
+        <p className="text-2xl md:text-3xl font-bold text-cyan-300">{value}</p>
         {children}
       </div>
       <p className="text-xs text-gray-400">{label}</p>
@@ -42,9 +42,9 @@ function LabeledFeatureItem({ feature, onClick }) {
   const lon = feature.coordinates ? feature.coordinates[1].toFixed(2) : 'N/A';
 
   return (
-    <li 
+    <li
       className="flex items-start gap-3 p-3 rounded-xl bg-gray-900 border border-cyan-800 hover:bg-gray-800 cursor-pointer transition-all duration-150 shadow-inner-dark"
-      onClick={() => onClick(feature.id)} 
+      onClick={() => onClick(feature.id)}
     >
       <div className="w-4 h-4 rounded-full border-2 border-cyan-500 mt-1 flex-shrink-0 bg-gray-900 shadow-feature-glow"></div>
       <div>
@@ -66,42 +66,50 @@ const coverageValue = '100%';
   return (
     <>
       {isOpen && (
-        <div 
-          className="md:hidden fixed inset-0 bg-black/70 z-30" 
+        <div
+          className="md:hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-30"
           onClick={toggleSidebar}
         ></div>
       )}
 
-      <aside 
-        className={`w-[350px] h-full bg-[#111111] text-gray-200 flex flex-col p-4 border-r border-cyan-800 
-                   fixed md:relative inset-y-0 left-0 z-40 
-                   transition-transform duration-300 ease-in-out
-                   ${isOpen ? 'translate-x-0' : '-translate-x-full'} 
-                   md:translate-x-0`}
+      <aside
+        className={`h-full bg-[#111111] text-gray-200 flex flex-col p-4 border-r border-cyan-800
+                    fixed md:relative inset-y-0 left-0 z-40
+                    transition-transform duration-300 ease-in-out
+                    w-11/12 max-w-sm md:w-[350px] md:max-w-none /* Responsive width */
+                    ${isOpen ? 'translate-x-0' : '-translate-x-full'} /* Slides in/out on mobile */
+                    md:translate-x-0 /* Stays put on desktop */`}
       >
-        
-        <header className="mb-4 flex items-center gap-2">
-          <img 
-              src={AstraLensLogo} 
-              alt="AstraLens Logo" 
+
+        <header className="mb-4 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <img
+              src={AstraLensLogo}
+              alt="AstraLens Logo"
               className="h-6 w-6 filter drop-shadow-lg shadow-cyan-400"
-          />
-          <div>
+            />
+            <div>
               <h1 className="text-lg font-bold text-white">Lunar Reconnaissance</h1>
               <h2 className="text-xs text-gray-400">Mission Control</h2>
+            </div>
           </div>
+          <button onClick={toggleSidebar} className="md:hidden p-1 text-gray-400 hover:text-white transition-colors">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
         </header>
 
         <section className="flex justify-between items-center p-3 bg-gray-900 rounded-xl border border-cyan-800 mb-4 shadow-md shadow-cyan-900/50">
           <StatusMetric value={allFeatures?.length || 0} label="Features" />
-          <StatusMetric value={coverageValue} label="Coverage" /> 
-          <StatusMetric 
+          <StatusMetric value={coverageValue} label="Coverage" />
+          <StatusMetric
             value={
-                <span className="flex items-center gap-1 text-green-400">
-                    <LiveIcon />
-                    LIVE
-                </span>
-            } 
+              <span className="flex items-center gap-1 text-green-400">
+                <LiveIcon />
+                LIVE
+              </span>
+            }
             label="Status"
           />
         </section>
@@ -111,49 +119,49 @@ const coverageValue = '100%';
         <section className="mb-4">
           <h3 className="text-sm font-semibold text-gray-400 mb-2 uppercase tracking-wider">Analysis Tools</h3>
           <div className="space-y-1">
-          
-          <button 
-            onClick={toggleMeasureMode} 
+
+          <button
+            onClick={toggleMeasureMode}
             className={`w-full text-left p-2 rounded-lg transition-all duration-200 font-medium flex items-center gap-3
-                      ${appMode === 'measure' 
-                        ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-500/30' 
-                        : 'hover:bg-gray-800'}`}
+                        ${appMode === 'measure'
+                          ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-500/30'
+                          : 'hover:bg-gray-800'}`}
             title="Calculate the distance between two selected points on the lunar surface."
           >
-                <ToolIcon name="Measure Distance" className="w-5 h-5" />
+              <ToolIcon name="Measure Distance" className="w-5 h-5" />
             Measure Distance
-          </button> 
-          
-          <button 
-            onClick={toggleSearch} 
+          </button>
+
+          <button
+            onClick={toggleSearch}
             className="w-full text-left p-2 rounded-lg transition-all duration-200 font-medium flex items-center gap-3 hover:bg-gray-800"
             title="Opens the search panel to locate features by their unique ID."
           >
-                <ToolIcon name="Feature ID Search" className="w-5 h-5" />
+              <ToolIcon name="Feature ID Search" className="w-5 h-5" />
             Feature ID Search
-          </button>           
-          
-          <button 
-            onClick={toggleAnalysisMode} 
+          </button>
+
+          <button
+            onClick={toggleAnalysisMode}
             className={`w-full text-left p-2 rounded-lg transition-all duration-200 font-medium flex items-center gap-3
-                      ${appMode === 'analysis' 
-                        ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-500/30' 
-                        : 'hover:bg-gray-800'}`}
+                        ${appMode === 'analysis'
+                          ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-500/30'
+                          : 'hover:bg-gray-800'}`}
             title="Toggle the specialized analysis mode for evaluating potential landing zones."
           >
-                <ToolIcon name="Landing Site Suitability Analysis" className="w-5 h-5" />
+              <ToolIcon name="Landing Site Suitability Analysis" className="w-5 h-5" />
             Landing Site Suitability Analysis
           </button>
-          
-          <button 
-            onClick={toggleAiPanel} 
+
+          <button
+            onClick={toggleAiPanel}
             className={`w-full text-left p-2 rounded-lg transition-all duration-200 font-medium flex items-center gap-3
-                      ${isAiPanelOpen 
-                        ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-500/30' 
-                        : 'hover:bg-gray-800'}`}
+                        ${isAiPanelOpen
+                          ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-500/30'
+                          : 'hover:bg-gray-800'}`}
             title="Open the Astra AI Assistant panel for advanced queries and conversational data analysis."
           >
-                <ToolIcon name="Astra AI Assistant" className="w-5 h-5" />
+              <ToolIcon name="Astra AI Assistant" className="w-5 h-5" />
             Astra AI Assistant
           </button>
           </div>
@@ -167,10 +175,10 @@ const coverageValue = '100%';
             {allFeatures.length > 0 ? (
               <ul className="space-y-1">
                 {allFeatures.map(feature => (
-                  <LabeledFeatureItem 
-                    key={feature.id} 
-                    feature={feature} 
-                    onClick={selectFeatureForSearch} 
+                  <LabeledFeatureItem
+                    key={feature.id}
+                    feature={feature}
+                    onClick={selectFeatureForSearch}
                   />
                 ))}
               </ul>
@@ -192,4 +200,3 @@ const coverageValue = '100%';
 }
 
 export default Sidebar;
-
