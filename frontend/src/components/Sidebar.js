@@ -59,7 +59,7 @@ function LabeledFeatureItem({ feature, onClick }) {
 }
 
 function Sidebar({ isOpen, toggleSidebar, toggleSearch }) {
-const { lunarData, allFeatures, selectFeatureForSearch, appMode, toggleMeasureMode, toggleAnalysisMode, isAiPanelOpen, toggleAiPanel } = useContext(MapContext);
+const { lunarData, allFeatures, selectFeatureForSearch, appMode, toggleMeasureMode, toggleAnalysisMode, isAiPanelOpen, toggleAiPanel} = useContext(MapContext);
 
 const coverageValue = '100%';
 
@@ -183,7 +183,7 @@ const coverageValue = '100%';
         </section>
 
         <footer className="text-center pt-3 flex-shrink-0 flex justify-between text-xs border-t border-gray-800 mt-3">
-          <p className="text-gray-500">2025 NASA Space Apps Challenge</p>
+          <p className="text-gray-500">© 2025 NASA Space Apps Challenge</p>
           <a href="#" className="text-cyan-400 hover:text-cyan-300 transition-colors">Dream Architects</a>
         </footer>
       </aside>

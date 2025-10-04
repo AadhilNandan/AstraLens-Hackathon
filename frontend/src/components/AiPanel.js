@@ -2,7 +2,7 @@ import React, { useState, useRef, useContext, useEffect } from 'react';
 import { MapContext } from '../App';
 
 export default function AiPanel() {
-  const { isAiPanelOpen, toggleAiPanel, chatHistory, isAiLoading, askAi } = useContext(MapContext);
+  const { isAiPanelOpen, toggleAiPanel, chatHistory, cooldown, askAi, isAiLoading } = useContext(MapContext);
   const [userInput, setUserInput] = useState('');
   const chatEndRef = useRef(null);
 
@@ -13,7 +13,7 @@ export default function AiPanel() {
   }, [chatHistory]);
 
   const handleSend = () => {
-    if (userInput.trim() && !isAiLoading) {
+    if (userInput.trim() && cooldown === 0) {
       askAi(userInput);
       setUserInput('');
     }
@@ -96,7 +96,7 @@ export default function AiPanel() {
     </div>
   </div>
 ))}
-            {isAiLoading && (
+            {isAiLoading && ( 
               <div className="flex justify-start">
                 <div className="bg-[#22313a] text-white rounded-[20px] px-6 py-4 max-w-xs shadow-lg">
       <span className="text-base animate-pulse">Astra is thinking...</span>
@@ -116,17 +116,21 @@ export default function AiPanel() {
               onKeyDown={handleKeyDown}
               placeholder="Ask Astra about lunar features, landing sites, or mission data..."
               className="flex-grow bg-black/60 border-2 border-cyan-600 rounded-xl p-4 text-white focus:outline-none focus:ring-2 focus:ring-cyan-400 shadow-inner-dark text-base"
-              disabled={isAiLoading}
+              disabled={cooldown > 0}
               title="Type your question here"
             />
             <button 
               onClick={handleSend} 
-              disabled={isAiLoading} 
-              className="bg-cyan-600 hover:bg-cyan-500 text-white font-bold w-14 h-14 rounded-xl transition-colors disabled:opacity-50 flex items-center justify-center"
+              disabled={cooldown > 0} 
+              className="bg-cyan-600 hover:bg-cyan-500 text-white font-bold w-16 h-14 rounded-xl transition-colors disabled:opacity-50 flex items-center justify-center"
             >
-              <svg className="w-7 h-7 rotate-45 -mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-              </svg>
+              {cooldown > 0 ? (
+                <span className="text-lg font-bold">{cooldown}s</span>
+              ) : (
+                <svg className="w-7 h-7 rotate-45 -mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                </svg>
+              )}
             </button>
           </div>
           <div className="text-xs text-cyan-100/70 mt-3">

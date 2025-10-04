@@ -19,16 +19,14 @@ function App() {
   const [isAiPanelOpen, setIsAiPanelOpen] = useState(false);
   const [chatHistory, setChatHistory] = useState([]);
   const [isAiLoading, setIsAiLoading] = useState(false);
- 
+  const [cooldown, setCooldown] = useState(0);
 
   useEffect(() => {
-    // Fetch the comprehensive list for the sidebar and search
     fetch('/features_all.json')
       .then(response => response.json())
       .then(data => setAllFeatures(data))
       .catch(error => console.error("Failed to load allFeatures.json:", error));
 
-    // Fetch the curated database for the AI
     fetch('/lunar_database.json')
       .then(response => response.json())
       .then(data => setLunarData(data))
@@ -59,56 +57,53 @@ function App() {
     });
   };
 
-//--- AI Assistant Logic ---
-const askAi = async (userQuestion) => {
-  if (!lunarData) {
-    setChatHistory(prev => [...prev, { role: 'model', text: "Sorry, the lunar database is not loaded yet." }]);
-    return;
-  }
-
-  setIsAiLoading(true);
-  const updatedChatHistory = [...chatHistory, { role: 'user', text: userQuestion }];
-  setChatHistory(updatedChatHistory);
-
-  // The URL of your backend endpoint on Render
-  const yourServerUrl = 'https://astralens-hackathon.onrender.com/ask-ai';
-  
-
-  try {
-    const response = await fetch(yourServerUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      // Send the question and knowledge base to your server
-      body: JSON.stringify({ 
-        user_question: userQuestion,
-        knowledge_base: lunarData,
-      })
-    });
-
-    if (!response.ok) {
-      // This will catch errors from your server or the Google API
-      throw new Error(`Server request failed with status ${response.status}`);
+  const askAi = async (userQuestion) => {
+    if (!lunarData) {
+        setChatHistory(prev => [...prev, { role: 'model', text: "Sorry, the lunar database is not loaded yet." }]);
+        return;
     }
+    if (isAiLoading || cooldown > 0) return;
+    setIsAiLoading(true);
+    const updatedChatHistory = [...chatHistory, { role: 'user', text: userQuestion }];
+    setChatHistory(updatedChatHistory);
+    const yourServerUrl = 'https://astralens-hackathon.onrender.com/ask-ai';
+    try {
+        const response = await fetch(yourServerUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                user_question: userQuestion,
+            })
+        });
+        if (!response.ok) {
+            throw new Error(`Server request failed with status ${response.status}`);
+        }
+        const result = await response.json();
+        const aiResponse = result.answer || "Sorry, I couldn't process that request.";
+        setChatHistory(prev => [...prev, { role: 'model', text: aiResponse }]);
+    } catch (error) {
+        console.error("Error asking AI:", error);
+        setChatHistory(prev => [...prev, { role: 'model', text: "An error occurred while contacting the AI. Please try again." }]);
+    } finally {
+        setIsAiLoading(false);
+        let secondsLeft = 5;
+        setCooldown(secondsLeft);
+        const timer = setInterval(() => {
+            secondsLeft--;
+            setCooldown(secondsLeft);
+            if (secondsLeft <= 0) {
+                clearInterval(timer);
+            }
+        }, 1000);
+    }
+  };
 
-    const result = await response.json();
-    const aiResponse = result.answer || "Sorry, I couldn't process that request.";
-    
-    setChatHistory(prev => [...prev, { role: 'model', text: aiResponse }]);
-
-  } catch (error) {
-    console.error("Error asking AI:", error);
-    setChatHistory(prev => [...prev, { role: 'model', text: "An error occurred while contacting the AI. Please try again." }]);
-  } finally {
-    setIsAiLoading(false);
-  }
-};
-    const toggleAiPanel = () => {
+  const toggleAiPanel = () => {
     setIsAiPanelOpen(prev => !prev);
   };
 
   const selectFeatureForSearch = (id) => {
     console.log(`[App.js] A feature was clicked! Setting searchId to: "${id}"`);
-    
     setSearchId(String(id)); 
     setIsSearchVisible(true); 
   };
@@ -128,53 +123,34 @@ const askAi = async (userQuestion) => {
   }, []);
 
   const contextValue = {
-    points,
-    addPoint,
-    clearPoints,
-    distanceKm,
-    setDistance,
-    labeledFeatures,
-    setLabeledFeatures,
-    lunarData,
-    allFeatures,
-    searchId, 
-    setSearchId, 
-    selectFeatureForSearch,
-    appMode,
-    toggleMeasureMode,
-    analysisResult,
-    setAnalysisResult,
-    toggleAnalysisMode,
-    isAiPanelOpen,
-    toggleAiPanel,
-    chatHistory,
-    isAiLoading,
-    askAi, 
+    points, addPoint, clearPoints, distanceKm, setDistance, labeledFeatures, setLabeledFeatures,
+    lunarData, allFeatures, searchId, setSearchId, selectFeatureForSearch, appMode,
+    toggleMeasureMode, analysisResult, setAnalysisResult, toggleAnalysisMode, isAiPanelOpen,
+    toggleAiPanel, chatHistory, isAiLoading, cooldown, askAi, 
   };
 
   return (
-      <MapContext.Provider value={contextValue}>
-      <div className={`flex h-screen w-screen bg-black ${appMode === 'measure' || appMode === 'analysis' ? 'cursor-crosshair' : ''}`}>          
+    <MapContext.Provider value={contextValue}>
+      <div className={`flex h-screen w-screen bg-black ${appMode === 'measure' || appMode === 'analysis' ? 'cursor-crosshair' : ''}`}>       
         <Sidebar 
-            isOpen={isSidebarOpen} 
-            toggleSidebar={toggleSidebar}
-            toggleSearch={() => setIsSearchVisible(prev => !prev)} 
-          />
+          isOpen={isSidebarOpen} 
+          toggleSidebar={toggleSidebar}
+          toggleSearch={() => setIsSearchVisible(prev => !prev)} 
+        />
+        
+        <main className="flex-grow h-full relative">
+          <div className="absolute top-4 left-4 md:hidden z-[1001]">
+            <button onClick={toggleSidebar} className="p-2 text-white">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+          </div>
           
-          <main className="flex-grow h-full relative">
-            <div className="absolute top-4 left-4 md:hidden z-[1001]">
-              <button onClick={toggleSidebar} className="p-2 text-white">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              </button>
-            </div>
-            
-            <MapView isSearchVisible={isSearchVisible} />
-          </main>
-        </div>
-      </MapContext.Provider>
-    );
+          <MapView isSearchVisible={isSearchVisible} />
+        </main>
+      </div>
+    </MapContext.Provider>
+  );
 }
-
 export default App;
